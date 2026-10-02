@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Аяллын Төлөвлөгч</title>
+  <meta name="description" content="Personal Travel Planning and Travel Memory Management Web System" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script>
+    // Theme-г хамгийн түрүүнд тохируулж "flash"-аас сэргийлнэ
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+  <!-- ============ АЧААЛЖ БАЙНА ============ -->
+  <div id="boot" class="boot"><div class="spinner"></div></div>
+
+  <!-- ============ НЭВТРЭХ / БҮРТГҮҮЛЭХ ============ -->
+  <section id="auth-view" class="auth" hidden>
+    <div class="auth-card">
+      <div class="brand brand-lg">
+        <span class="brand-mark">✈</span>
+        <div>
+          <strong>Аяллын Төлөвлөгч</strong>
+          <small>Төлөвлө · Аяла · Дурс</small>
+        </div>
+      </div>
+
+      <div class="tabs auth-tabs" role="tablist">
+        <button class="tab active" data-auth-tab="login" role="tab">Нэвтрэх</button>
+        <button class="tab" data-auth-tab="register" role="tab">Бүртгүүлэх</button>
+      </div>
+
+      <form id="login-form" class="form" autocomplete="on">
+        <label>Имэйл<input type="email" name="email" required autocomplete="email" placeholder="you@example.com" /></label>
+        <label>Нууц үг<input type="password" name="password" required minlength="6" autocomplete="current-password" placeholder="••••••" /></label>
+        <button class="btn btn-primary btn-block" type="submit">Нэвтрэх</button>
+        <button class="link-btn" type="button" id="forgot-btn">Нууц үгээ мартсан уу?</button>
+      </form>
+
+      <form id="register-form" class="form" hidden autocomplete="on">
+        <label>Нэр<input type="text" name="name" required maxlength="60" autocomplete="name" placeholder="Таны нэр" /></label>
+        <label>Имэйл<input type="email" name="email" required autocomplete="email" placeholder="you@example.com" /></label>
+        <label>Нууц үг<input type="password" name="password" required minlength="6" autocomplete="new-password" placeholder="Хамгийн багадаа 6 тэмдэгт" /></label>
+        <label>Нууц үг давтах<input type="password" name="password2" required minlength="6" autocomplete="new-password" /></label>
+        <button class="btn btn-primary btn-block" type="submit">Бүртгүүлэх</button>
+      </form>
+
+      <p id="auth-msg" class="auth-msg" role="status"></p>
+    </div>
+    <button class="icon-btn theme-toggle auth-theme" type="button" title="Өнгө солих" aria-label="Өнгө солих">◐</button>
+  </section>
+
+  <!-- ============ ҮНДСЭН АПП ============ -->
+  <div id="app-view" class="layout" hidden>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-mark">✈</span>
+        <strong>Аяллын Төлөвлөгч</strong>
+      </div>
+      <nav class="nav">
+        <a href="#/dashboard" data-nav="dashboard"><span class="ni">⌂</span>Нүүр</a>
+        <a href="#/trips" data-nav="trips"><span class="ni">☰</span>Аяллууд</a>
+        <a href="#/timeline" data-nav="timeline"><span class="ni">⋮</span>Timeline</a>
+        <a href="#/history" data-nav="history"><span class="ni">◷</span>Түүх</a>
+      </nav>
+      <div class="sidebar-foot">
+        <button class="btn btn-primary btn-block" type="button" data-action="new-trip">+ Шинэ аялал</button>
+        <div class="user-row">
+          <div class="avatar" id="user-avatar">?</div>
+          <div class="user-meta">
+            <strong id="user-name">—</strong>
+            <small id="user-email"></small>
+          </div>
+        </div>
+        <div class="foot-actions">
+          <button class="btn btn-ghost theme-toggle" type="button"><span class="theme-label">Dark mode</span></button>
+          <button class="btn btn-ghost" type="button" id="logout-btn">Гарах</button>
+        </div>
+      </div>
+    </aside>
+
+    <header class="topbar">
+      <button class="icon-btn" id="menu-btn" aria-label="Цэс">☰</button>
+      <div class="brand"><span class="brand-mark">✈</span><strong>Аяллын Төлөвлөгч</strong></div>
+      <button class="icon-btn theme-toggle" aria-label="Өнгө солих">◐</button>
+    </header>
+    <div class="scrim" id="scrim"></div>
+
+    <main class="main" id="view" tabindex="-1"></main>
+  </div>
+
+  <!-- ============ MODAL ============ -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head">
+        <h2 id="modal-title"></h2>
+        <button class="icon-btn" data-close aria-label="Хаах">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ============ ЗУРАГ ТОМРУУЛАХ ============ -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="icon-btn lb-close" aria-label="Хаах">✕</button>
+    <img alt="" id="lightbox-img" />
+    <p id="lightbox-cap"></p>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
